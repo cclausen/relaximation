@@ -17,7 +17,8 @@ public class RelaximationToolWindow {
             JSONObject gifs = gifLoader.getGifs();
             String url = "https://i.pinimg.com/originals/01/fb/2c/01fb2cb2cf0855514cf1df69f46acda8.gif";
             JGif gif = new JGif(url);
-            url = gifs.getJSONArray("results").getJSONObject(0).getJSONArray("media").getJSONObject(0).getJSONObject("gif").getString("url");
+            url = gifs.getJSONArray("results").getJSONObject(0).getJSONArray("media").getJSONObject(0).getJSONObject(
+                    "gif").getString("url");
             gif.setUrl(url);
             gif.setBounds(100, 100, 100, 100);
             this.relaximationToolWindowContent.add(gif, new GridConstraints());

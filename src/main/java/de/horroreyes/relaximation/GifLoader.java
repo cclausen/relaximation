@@ -34,8 +34,8 @@ public class GifLoader {
         }).start();
     }
 
-    public JSONObject getGifs(){
-        while(gifs.get() == null){
+    public JSONObject getGifs() {
+        while (gifs.get() == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -54,7 +54,7 @@ public class GifLoader {
 
         final String url = String.format("https://api.tenor.com/v1/search?q=%1$s&key=%2$s&limit=%3$s",
                 searchTerm, API_KEY, limit);
-            return get(url);
+        return get(url);
     }
 
     /**

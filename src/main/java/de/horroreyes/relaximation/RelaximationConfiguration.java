@@ -42,6 +42,7 @@ public class RelaximationConfiguration implements SearchableConfigurable {
         settings.userId = relaximationSettingsComponent.getUserNameText();
         settings.ideaStatus = relaximationSettingsComponent.getIdeaUserStatus();
     }
+
     @Override
     public void reset() {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
