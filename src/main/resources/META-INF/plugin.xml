@@ -16,6 +16,9 @@
                                  id="de.horroreyes.relaximation.RelaximationConfiguration" displayName="Relaximation"/>
 
         <applicationService serviceImplementation="de.horroreyes.relaximation.RelaximationSettingsState"/>
+
+        <toolWindow id="RelaximationWindow" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+                    factoryClass="de.horroreyes.relaximation.RelaximationToolWindowFactory"/>
     </extensions>
 
     <actions>
