@@ -1,0 +1,24 @@
+<idea-plugin>
+    <id>de.horroreyes.Relaximation</id>
+    <name>Relaximation</name>
+    <vendor email="horroreyes@horroreyes.de" url="http://www.horroreyes.de">HorrorEyes</vendor>
+
+    <description><![CDATA[
+    Displays relaxing GIFs from the web in a tool-window
+    ]]></description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable parentId="tools" instance="de.horroreyes.relaximation.RelaximationConfiguration"
+                                 id="de.horroreyes.relaximation.RelaximationConfiguration" displayName="Relaximation"/>
+
+        <applicationService serviceImplementation="de.horroreyes.relaximation.RelaximationSettingsState"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>
