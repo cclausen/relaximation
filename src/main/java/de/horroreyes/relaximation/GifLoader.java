@@ -1,5 +1,6 @@
 package de.horroreyes.relaximation;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.json.JSONObject;
 
@@ -8,10 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GifLoader {
@@ -20,18 +25,34 @@ public class GifLoader {
 
     private static final String API_KEY = "IWBW9Q86UTOG";
 
+    private final AtomicInteger currentGif = new AtomicInteger();
+
     AtomicReference<JSONObject> gifs = new AtomicReference<>();
 
+    RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
+    Runnable thread = () -> {
+        JSONObject searchResult = getSearchResults(10);
+        gifs.set(searchResult);
+    };
+
     public GifLoader() {
-        new Thread(() -> {
+        currentGif.set(0);
+        new Thread(thread).start();
+    }
 
-            final String searchTerm = "excited";
+    public URL getNextGif() throws MalformedURLException {
+        log.warn("getting new");
+        if (this.gifs.get() == null || this.gifs.get().getJSONArray("results").length() <= this.currentGif.get()) {
+            this.getGifs();
+            this.currentGif.set(0);
+        }
+        JSONObject gif = this.gifs.get().getJSONArray("results").getJSONObject(this.currentGif.get());
+        this.currentGif.set(this.currentGif.get() + 1);
+        new Thread(thread).start();
+        log.warn("The NEW");
+        return new URL(gif.getJSONArray("media").getJSONObject(0).getJSONObject(
+                "gif").getString("url"));
 
-            // make initial search request for the first 8 items
-            JSONObject searchResult = getSearchResults(searchTerm, 10);
-            gifs.set(searchResult);
-
-        }).start();
     }
 
     public JSONObject getGifs() {
@@ -48,13 +69,19 @@ public class GifLoader {
     /**
      * Get Search Result GIFs
      */
-    public JSONObject getSearchResults(String searchTerm, int limit) {
+    public JSONObject getSearchResults(int limit) {
 
         // make search request - using default locale of EN_US
 
-        final String url = String.format("https://api.tenor.com/v1/search?q=%1$s&key=%2$s&limit=%3$s",
-                searchTerm, API_KEY, limit);
-        return get(url);
+        final String url;
+        try {
+            url = String.format("https://api.tenor.com/v1/search?q=%1$s&key=%2$s&limit=%3$s",
+                    URLEncoder.encode(settings.searchString, StandardCharsets.UTF_8.toString()), API_KEY, limit);
+            return get(url);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -109,4 +136,5 @@ public class GifLoader {
         }
         return new JSONObject("");
     }
+
 }

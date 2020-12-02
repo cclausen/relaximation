@@ -12,11 +12,12 @@ import java.net.URL;
  * @author Steffen Rumpf
  */
 public class JGif extends JPanel {
+    private static final long serialVersionUID = -4492480149124880432L;
     private JLabel label;
     private final JPanel panel;
 
-    public JGif(String url) throws MalformedURLException {
-        label = new JLabel(new ImageIcon(new URL(url)));
+    public JGif(URL url) throws MalformedURLException {
+        label = new JLabel(new ImageIcon(url));
         panel = new JPanel();
         panel.add(label);
         add(panel);

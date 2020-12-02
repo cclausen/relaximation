@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 )
 public class RelaximationSettingsState implements PersistentStateComponent<RelaximationSettingsState> {
 
-    public String userId = "John Q. Public";
+    public String searchString = "animal relax";
     public boolean ideaStatus = false;
 
     public static RelaximationSettingsState getInstance() {

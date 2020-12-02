@@ -10,13 +10,13 @@ import javax.swing.*;
 
 public class RelaximationSettingsComponent {
     private final JPanel myMainPanel;
-    private final JBTextField myUserNameText = new JBTextField();
+    private final JBTextField searchString = new JBTextField();
     private final JBCheckBox myIdeaUserStatus = new JBCheckBox("Do you use IntelliJ IDEA? ");
 
     public RelaximationSettingsComponent() {
         myMainPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Enter user name: "), myUserNameText, 1, false)
-                .addComponent(myIdeaUserStatus, 1)
+                .addLabeledComponent(new JBLabel("Enter keywords to search: "), searchString, 1, false)
+//                .addComponent(myIdeaUserStatus, 1)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -26,16 +26,16 @@ public class RelaximationSettingsComponent {
     }
 
     public JComponent getPreferredFocusedComponent() {
-        return myUserNameText;
+        return searchString;
     }
 
     @NotNull
-    public String getUserNameText() {
-        return myUserNameText.getText();
+    public String getSearchString() {
+        return searchString.getText();
     }
 
-    public void setUserNameText(@NotNull String newText) {
-        myUserNameText.setText(newText);
+    public void setUserNameText(@NotNull String search) {
+        searchString.setText(search);
     }
 
     public boolean getIdeaUserStatus() {

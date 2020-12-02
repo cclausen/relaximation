@@ -31,7 +31,7 @@ public class RelaximationConfiguration implements SearchableConfigurable {
     @Override
     public boolean isModified() {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
-        boolean modified = !relaximationSettingsComponent.getUserNameText().equals(settings.userId);
+        boolean modified = !relaximationSettingsComponent.getSearchString().equals(settings.searchString);
         modified |= relaximationSettingsComponent.getIdeaUserStatus() != settings.ideaStatus;
         return modified;
     }
@@ -39,14 +39,14 @@ public class RelaximationConfiguration implements SearchableConfigurable {
     @Override
     public void apply() throws ConfigurationException {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
-        settings.userId = relaximationSettingsComponent.getUserNameText();
+        settings.searchString = relaximationSettingsComponent.getSearchString();
         settings.ideaStatus = relaximationSettingsComponent.getIdeaUserStatus();
     }
 
     @Override
     public void reset() {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
-        relaximationSettingsComponent.setUserNameText(settings.userId);
+        relaximationSettingsComponent.setUserNameText(settings.searchString);
         relaximationSettingsComponent.setIdeaUserStatus(settings.ideaStatus);
     }
 
