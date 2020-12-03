@@ -9,14 +9,9 @@ import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 
 public class RelaximationToolWindowFactory implements ToolWindowFactory, DumbAware {
-    /**
-     * Create the tool window content.
-     *
-     * @param project    current project
-     * @param toolWindow current tool window
-     */
+    @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        RelaximationToolWindow relaximationToolWindow = new RelaximationToolWindow(toolWindow);
+        RelaximationToolWindow relaximationToolWindow = new RelaximationToolWindow();
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(relaximationToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);

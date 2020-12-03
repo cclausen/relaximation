@@ -2,6 +2,7 @@ package de.horroreyes.relaximation;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -36,16 +37,16 @@ public class GifLoader {
 
     private final AtomicReference<JSONObject> gifs = new AtomicReference<>();
     private final AtomicReference<String> searchString = new AtomicReference<>();
-    Random random = new Random();
+    private final Random random = new Random();
 
-    RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
+    private final RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
 
-    Runnable thread = () -> {
+    private final Runnable thread = () -> {
         JSONObject searchResult = getSearchResults(10);
         gifs.set(searchResult);
     };
 
-    public URL getNextGif() throws MalformedURLException {
+    public URL getNextGif() throws MalformedURLException, InterruptedException {
         if (this.gifs.get() == null || this.currentGifTotal.get() >= settings.loopSize) {
             this.gifs.set(null);
             this.currentGif.set(0);
@@ -72,41 +73,52 @@ public class GifLoader {
             return settings.searchString;
         }
         if (settings.combination.equals("Alle Keywords zufällig kombinieren")) {
-            List<String> list = new ArrayList<>(Arrays.asList(settings.searchString.split(" ")));
-            int howMany = random.nextInt(list.size()) + 1;
-            ArrayList<String> result = new ArrayList<>();
-            while (result.size() < howMany) {
-                int index = random.nextInt(list.size());
-                result.add(list.get(index));
-                list.remove(index);
-            }
-            return String.join(" ", result);
+            return getRandomSearchString();
         }
         if (settings.combination.equals("Alle Keywords einzeln nacheinander")) {
-            String[] strings = settings.searchString.split(" ");
-            if (searchString.get() == null) {
-                return strings[0];
-            } else {
-                boolean next = false;
-                for (String string : strings) {
-                    if (next) {
-                        return string;
-                    }
-                    if (string.equals(searchString.get())) {
-                        next = true;
-                    }
+            return getSequentialSearchString();
+        }
+        return "error";
+    }
+
+    private String getSequentialSearchString() {
+        String[] strings = settings.searchString.split(" ");
+        if (searchString.get() == null) {
+            return strings[0];
+        } else {
+            boolean next = false;
+            for (String string : strings) {
+                if (next) {
+                    return string;
+                }
+                if (string.equals(searchString.get())) {
+                    next = true;
                 }
             }
         }
         return "error";
     }
 
-    public void getGifs() {
+    @NotNull
+    private String getRandomSearchString() {
+        List<String> list = new ArrayList<>(Arrays.asList(settings.searchString.split(" ")));
+        int howMany = random.nextInt(list.size()) + 1;
+        ArrayList<String> result = new ArrayList<>();
+        while (result.size() < howMany) {
+            int index = random.nextInt(list.size());
+            result.add(list.get(index));
+            list.remove(index);
+        }
+        return String.join(" ", result);
+    }
+
+    public void getGifs() throws InterruptedException {
         while (gifs.get() == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Thread dead...", e);
+                throw e;
             }
         }
     }

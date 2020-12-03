@@ -2,7 +2,6 @@ package de.horroreyes.relaximation;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.uiDesigner.core.GridConstraints;
 
 import javax.swing.*;
@@ -12,14 +11,14 @@ import java.net.URL;
 
 public class RelaximationToolWindow {
     private JPanel relaximationToolWindowContent;
-    ActionListener changer = evt -> changeGif();
-    GifLoader gifLoader = new GifLoader();
-    JGif gif;
+    private final GifLoader gifLoader = new GifLoader();
+    private JGif gif;
+    private final RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
+    private final Timer timer;
     private static final Logger log = Logger.getInstance(RelaximationToolWindow.class);
-    RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
-    Timer timer;
 
-    public RelaximationToolWindow(ToolWindow toolWindow) {
+    public RelaximationToolWindow() {
+        ActionListener changer = evt -> changeGif();
         timer = new Timer(settings.duration * 1000, changer);
         timer.setRepeats(true);
         timer.start();
@@ -34,14 +33,16 @@ public class RelaximationToolWindow {
                 RelaximationToolWindow.this.relaximationToolWindowContent.remove(gif);
             }
             gif = new JGif(url);
-            gif.setBounds(100, 100, 100, 100);
-            RelaximationToolWindow.this.relaximationToolWindowContent.add(gif, new GridConstraints());
-            RelaximationToolWindow.this.relaximationToolWindowContent.revalidate();
-            RelaximationToolWindow.this.relaximationToolWindowContent.repaint();
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        } catch (MalformedURLException | InterruptedException e) {
+            log.error("Uups, end of relaxing...", e);
+            gif = new JGif();
         }
+        gif.setBounds(100, 100, 100, 100);
+        RelaximationToolWindow.this.relaximationToolWindowContent.add(gif,
+                new GridConstraints());
+        RelaximationToolWindow.this.relaximationToolWindowContent.revalidate();
+        RelaximationToolWindow.this.relaximationToolWindowContent.repaint();
     }
 
 

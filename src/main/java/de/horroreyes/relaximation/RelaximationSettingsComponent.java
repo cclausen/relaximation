@@ -12,9 +12,9 @@ import javax.swing.*;
 public class RelaximationSettingsComponent {
     private final JPanel myMainPanel;
     private final JBTextField searchString = new JBTextField("relax animal");
-    String[] comboBoxListe = {"Alle Keywords kombinieren", "Alle Keywords zufällig kombinieren",
+    private final String[] comboBoxListe = {"Alle Keywords kombinieren", "Alle Keywords zufällig kombinieren",
             "Alle Keywords einzeln nacheinander"};
-    ComboBox<String> combination = new ComboBox<>(comboBoxListe);
+    private final ComboBox<String> combination = new ComboBox<>(comboBoxListe);
     private final JBIntSpinner duration = new JBIntSpinner(30, 3, 600);
     private final JBIntSpinner loopSize = new JBIntSpinner(30, 3, 600);
 
