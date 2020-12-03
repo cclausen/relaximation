@@ -16,6 +16,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,36 +30,78 @@ public class GifLoader {
     private static final String API_KEY = "IWBW9Q86UTOG";
 
     private final AtomicInteger currentGif = new AtomicInteger();
+    private final AtomicInteger currentGifTotal = new AtomicInteger();
 
-    AtomicReference<JSONObject> gifs = new AtomicReference<>();
+    private final AtomicReference<String> nextGifs = new AtomicReference<>();
+
+    private final AtomicReference<JSONObject> gifs = new AtomicReference<>();
+    private final AtomicReference<String> searchString = new AtomicReference<>();
+    Random random = new Random();
 
     RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
+
     Runnable thread = () -> {
         JSONObject searchResult = getSearchResults(10);
         gifs.set(searchResult);
     };
 
-    public GifLoader() {
-        currentGif.set(0);
-        new Thread(thread).start();
-    }
-
     public URL getNextGif() throws MalformedURLException {
-        log.warn("getting new");
+        if (this.gifs.get() == null || this.currentGifTotal.get() >= settings.loopSize) {
+            this.gifs.set(null);
+            this.currentGif.set(0);
+            this.currentGifTotal.set(0);
+            this.searchString.set(this.getNextSearchString());
+            this.nextGifs.set(null);
+            new Thread(thread).start();
+        }
         if (this.gifs.get() == null || this.gifs.get().getJSONArray("results").length() <= this.currentGif.get()) {
             this.getGifs();
             this.currentGif.set(0);
+            this.nextGifs.set(this.gifs.get().getString("next"));
         }
         JSONObject gif = this.gifs.get().getJSONArray("results").getJSONObject(this.currentGif.get());
         this.currentGif.set(this.currentGif.get() + 1);
-        new Thread(thread).start();
-        log.warn("The NEW");
+        currentGifTotal.set(this.currentGifTotal.get() + 1);
         return new URL(gif.getJSONArray("media").getJSONObject(0).getJSONObject(
                 "gif").getString("url"));
 
     }
 
-    public JSONObject getGifs() {
+    private String getNextSearchString() {
+        if (settings.combination.equals("Alle Keywords kombinieren")) {
+            return settings.searchString;
+        }
+        if (settings.combination.equals("Alle Keywords zufällig kombinieren")) {
+            List<String> list = new ArrayList<>(Arrays.asList(settings.searchString.split(" ")));
+            int howMany = random.nextInt(list.size()) + 1;
+            ArrayList<String> result = new ArrayList<>();
+            while (result.size() < howMany) {
+                int index = random.nextInt(list.size());
+                result.add(list.get(index));
+                list.remove(index);
+            }
+            return String.join(" ", result);
+        }
+        if (settings.combination.equals("Alle Keywords einzeln nacheinander")) {
+            String[] strings = settings.searchString.split(" ");
+            if (searchString.get() == null) {
+                return strings[0];
+            } else {
+                boolean next = false;
+                for (String string : strings) {
+                    if (next) {
+                        return string;
+                    }
+                    if (string.equals(searchString.get())) {
+                        next = true;
+                    }
+                }
+            }
+        }
+        return "error";
+    }
+
+    public void getGifs() {
         while (gifs.get() == null) {
             try {
                 Thread.sleep(1000);
@@ -63,7 +109,6 @@ public class GifLoader {
                 e.printStackTrace();
             }
         }
-        return gifs.get();
     }
 
     /**
@@ -75,8 +120,16 @@ public class GifLoader {
 
         final String url;
         try {
-            url = String.format("https://api.tenor.com/v1/search?q=%1$s&key=%2$s&limit=%3$s",
-                    URLEncoder.encode(settings.searchString, StandardCharsets.UTF_8.toString()), API_KEY, limit);
+            if (nextGifs.get() == null) {
+                url = String.format("https://api.tenor.com/v1/search?q=%1$s&key=%2$s&limit=%3$s",
+                        URLEncoder.encode(searchString.get(), StandardCharsets.UTF_8.toString()), API_KEY,
+                        limit);
+            } else {
+                url = String.format("https://api.tenor.com/v1/search?q=%1$s&key=%2$s&limit=%3$s&pos=%4$s",
+                        URLEncoder.encode(searchString.get(), StandardCharsets.UTF_8.toString()), API_KEY,
+                        limit, nextGifs.get());
+            }
+            log.warn(url);
             return get(url);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

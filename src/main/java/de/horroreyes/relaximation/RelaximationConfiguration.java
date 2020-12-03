@@ -1,6 +1,5 @@
 package de.horroreyes.relaximation;
 
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.util.NlsContexts;
 import org.jetbrains.annotations.NotNull;
@@ -32,22 +31,29 @@ public class RelaximationConfiguration implements SearchableConfigurable {
     public boolean isModified() {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
         boolean modified = !relaximationSettingsComponent.getSearchString().equals(settings.searchString);
-        modified |= relaximationSettingsComponent.getIdeaUserStatus() != settings.ideaStatus;
+        modified = modified || !relaximationSettingsComponent.getDuration().equals(settings.duration);
+        modified = modified || !relaximationSettingsComponent.getLoopSize().equals(settings.loopSize);
+        modified =
+                modified || !relaximationSettingsComponent.getCombination().equals(settings.combination);
         return modified;
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
         settings.searchString = relaximationSettingsComponent.getSearchString();
-        settings.ideaStatus = relaximationSettingsComponent.getIdeaUserStatus();
+        settings.duration = relaximationSettingsComponent.getDuration();
+        settings.loopSize = relaximationSettingsComponent.getLoopSize();
+        settings.combination = relaximationSettingsComponent.getCombination();
     }
 
     @Override
     public void reset() {
         RelaximationSettingsState settings = RelaximationSettingsState.getInstance();
         relaximationSettingsComponent.setUserNameText(settings.searchString);
-        relaximationSettingsComponent.setIdeaUserStatus(settings.ideaStatus);
+        relaximationSettingsComponent.setDuration(settings.duration);
+        relaximationSettingsComponent.setLoopSize(settings.loopSize);
+        relaximationSettingsComponent.setCombination(settings.combination);
     }
 
     @Override

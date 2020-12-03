@@ -1,5 +1,6 @@
 package de.horroreyes.relaximation;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -15,15 +16,18 @@ public class RelaximationToolWindow {
     GifLoader gifLoader = new GifLoader();
     JGif gif;
     private static final Logger log = Logger.getInstance(RelaximationToolWindow.class);
+    RelaximationSettingsState settings = ServiceManager.getService(RelaximationSettingsState.class);
+    Timer timer;
 
     public RelaximationToolWindow(ToolWindow toolWindow) {
-        changeGif();
-        Timer timer = new Timer(10000, changer);
+        timer = new Timer(settings.duration * 1000, changer);
         timer.setRepeats(true);
         timer.start();
+        changeGif();
     }
 
     private void changeGif() {
+        timer.setDelay(settings.duration * 1000);
         try {
             URL url = gifLoader.getNextGif();
             if (gif != null) {

@@ -19,8 +19,14 @@ import org.jetbrains.annotations.Nullable;
 )
 public class RelaximationSettingsState implements PersistentStateComponent<RelaximationSettingsState> {
 
+    public enum Combine {
+        COMBINE, RANDOM, SINGLE
+    }
+
     public String searchString = "animal relax";
-    public boolean ideaStatus = false;
+    public int loopSize = 30;
+    public int duration = 15;
+    public String combination = "RANDOM";
 
     public static RelaximationSettingsState getInstance() {
         return ServiceManager.getService(RelaximationSettingsState.class);
