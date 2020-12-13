@@ -36,7 +36,11 @@ public class RelaximationToolWindow {
 
         } catch (MalformedURLException | InterruptedException e) {
             log.error("Uups, end of relaxing...", e);
-            gif = new JGif();
+            try {
+                gif = new JGif(new URL("https://media1.tenor.com/images/963dbf83410067b8216bf3fbeec50874/tenor.gif"));
+            } catch (MalformedURLException e1) {
+                log.error("There is a problem with these life changing gifs...", e1);
+            }
         }
         gif.setBounds(100, 100, 100, 100);
         RelaximationToolWindow.this.relaximationToolWindowContent.add(gif,
