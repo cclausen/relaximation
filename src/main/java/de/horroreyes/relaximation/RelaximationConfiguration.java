@@ -1,13 +1,17 @@
 package de.horroreyes.relaximation;
 
+import com.intellij.openapi.extensions.BaseExtensionPointName;
+import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.util.NlsContexts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Collection;
+import java.util.Collections;
 
-public class RelaximationConfiguration implements SearchableConfigurable {
+public class RelaximationConfiguration implements SearchableConfigurable, Configurable.WithEpDependencies {
 
     private RelaximationSettingsComponent relaximationSettingsComponent;
 
@@ -64,5 +68,10 @@ public class RelaximationConfiguration implements SearchableConfigurable {
     @Override
     public void disposeUIResources() {
         relaximationSettingsComponent = null;
+    }
+
+    @Override
+    public @NotNull Collection<BaseExtensionPointName<?>> getDependencies() {
+        return Collections.emptySet();
     }
 }
